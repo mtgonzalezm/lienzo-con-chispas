@@ -69,19 +69,19 @@ export default function EditorQuiz({ quiz, onUpdate }) {
       <div>
         <span style={label}>Tipo</span>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' }}>
-          {TIPOS.map(({ id, Icon, label: lbl }) => (
+          {TIPOS.map(t => (
             <button
-              key={id}
-              onClick={() => cambiarTipo(id)}
+              key={t.id}
+              onClick={() => cambiarTipo(t.id)}
               style={{
                 display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 8px',
-                borderRadius: '6px', border: `1.5px solid ${tipo === id ? C.primary : C.border}`,
-                background: tipo === id ? 'rgba(3,174,210,0.1)' : '#fff',
+                borderRadius: '6px', border: `1.5px solid ${tipo === t.id ? C.primary : C.border}`,
+                background: tipo === t.id ? 'rgba(3,174,210,0.1)' : '#fff',
                 cursor: 'pointer', fontSize: '11px', fontWeight: '600',
-                color: tipo === id ? C.primary : C.muted, fontFamily: 'system-ui',
+                color: tipo === t.id ? C.primary : C.muted, fontFamily: 'system-ui',
               }}
             >
-              <Icon size={12} /> {lbl}
+              <t.Icon size={12} /> {t.label}
             </button>
           ))}
         </div>

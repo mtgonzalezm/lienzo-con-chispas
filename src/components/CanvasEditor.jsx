@@ -5,7 +5,7 @@ const C = { primary: '#03AED2', border: '#c8e8ee', bg: '#eaf7fa', muted: '#6b728
 
 const CanvasEditor = forwardRef(function CanvasEditor({
   imagenSrc, elementos, elementoSeleccionado, modo, esModoPreview,
-  dibujando, nuevaArea, puntosPoligono, cursorCanvas,
+  nuevaArea, puntosPoligono, cursorCanvas,
   onIniciarInteraccion, onMovimiento, onFinalizar,
   onClickCanvas, onElementoMouseDown, onElementoClick,
 }, ref) {

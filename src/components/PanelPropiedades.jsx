@@ -87,21 +87,21 @@ export default function PanelPropiedades({ elemento, onUpdate, onBorrar, editorW
             {[
               { id: 'texto', Icon: Type,        label: 'Texto'  },
               { id: 'quiz',  Icon: HelpCircle,  label: 'Quiz'   },
-            ].map(({ id: tid, Icon, label }) => (
+            ].map(opt => (
               <button
-                key={tid}
-                onClick={() => onUpdate({ tipoContenido: tid })}
+                key={opt.id}
+                onClick={() => onUpdate({ tipoContenido: opt.id })}
                 style={{
                   flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px',
                   padding: '7px', borderRadius: '7px',
-                  border: `1.5px solid ${tipoContenido === tid ? color : C.border}`,
-                  background: tipoContenido === tid ? `${color}15` : '#fff',
+                  border: `1.5px solid ${tipoContenido === opt.id ? color : C.border}`,
+                  background: tipoContenido === opt.id ? `${color}15` : '#fff',
                   cursor: 'pointer', fontSize: '12px', fontWeight: '600',
-                  color: tipoContenido === tid ? color : C.muted,
+                  color: tipoContenido === opt.id ? color : C.muted,
                   fontFamily: 'system-ui', transition: 'all 0.15s',
                 }}
               >
-                <Icon size={13} /> {label}
+                <opt.Icon size={13} /> {opt.label}
               </button>
             ))}
           </div>

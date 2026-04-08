@@ -30,6 +30,7 @@ const Sep = () => (
 const EditorWYSIWYG = forwardRef(function EditorWYSIWYG({ initialContent }, ref) {
   const editorRef     = useRef(null);
   const [modoHTML, setModoHTML] = useState(false);
+  const [htmlValue, setHtmlValue] = useState('');
   const htmlRef       = useRef(initialContent || '');
 
   // Inicializar contenido al montar
@@ -75,7 +76,9 @@ const EditorWYSIWYG = forwardRef(function EditorWYSIWYG({ initialContent }, ref)
 
   const toggleHTML = () => {
     if (!modoHTML) {
-      htmlRef.current = editorRef.current?.innerHTML || '';
+      const html = editorRef.current?.innerHTML || '';
+      htmlRef.current = html;
+      setHtmlValue(html);
       setModoHTML(true);
     } else {
       if (editorRef.current) editorRef.current.innerHTML = htmlRef.current;
@@ -108,8 +111,8 @@ const EditorWYSIWYG = forwardRef(function EditorWYSIWYG({ initialContent }, ref)
       {/* Área de edición */}
       {modoHTML ? (
         <textarea
-          defaultValue={htmlRef.current}
-          onChange={e => { htmlRef.current = e.target.value; }}
+          value={htmlValue}
+          onChange={e => { htmlRef.current = e.target.value; setHtmlValue(e.target.value); }}
           style={{
             width: '100%', minHeight: '150px', padding: '12px',
             border: 'none', outline: 'none', resize: 'vertical',

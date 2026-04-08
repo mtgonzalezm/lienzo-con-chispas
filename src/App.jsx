@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { MapPin, Square, Circle, Hexagon, ImagePlus, Save, Eye, EyeOff, Check } from 'lucide-react';
 import PanelArbol        from './components/PanelArbol';
 import PanelPropiedades  from './components/PanelPropiedades';
@@ -66,7 +66,16 @@ export default function App() {
   const [nuevaArea,          setNuevaArea]          = useState(null);
   const [puntosPoligono,     setPuntosPoligono]     = useState([]);
   const [cursorCanvas,       setCursorCanvas]       = useState(null);
-  const [repositorio,        setRepositorio]        = useState([]);
+  const [repositorio,        setRepositorio]        = useState(() => {
+    let repos = JSON.parse(localStorage.getItem('repositorio_chispas_v2') ?? 'null') ?? [];
+    if (!repos.length) {
+      const viejo = JSON.parse(localStorage.getItem('repositorio_chispas_final') ?? 'null') ?? [];
+      if (viejo.length) {
+        repos = viejo.map(p => ({ ...p, elementos: (p.elementos ?? []).map(migrarElemento) }));
+      }
+    }
+    return repos;
+  });
   const [hotspotVisor,       setHotspotVisor]       = useState(null);
   const [guardadoFlash,      setGuardadoFlash]      = useState(false);
 
@@ -75,19 +84,6 @@ export default function App() {
   const arrastrandoId  = useRef(null);
   const lastDragPos    = useRef(null);
   const hasDragged     = useRef(false);
-
-  // ─── Carga inicial ──────────────────────────────────────────────────────────
-  useEffect(() => {
-    let repos = JSON.parse(localStorage.getItem('repositorio_chispas_v2') ?? 'null') ?? [];
-    if (!repos.length) {
-      // Migrar desde formato anterior
-      const viejo = JSON.parse(localStorage.getItem('repositorio_chispas_final') ?? 'null') ?? [];
-      if (viejo.length) {
-        repos = viejo.map(p => ({ ...p, elementos: (p.elementos ?? []).map(migrarElemento) }));
-      }
-    }
-    setRepositorio(repos);
-  }, []);
 
   // ─── Guardar WYSIWYG (lee del DOM directamente) ────────────────────────────
   const leerWYSIWYG = useCallback(() => {
@@ -311,19 +307,19 @@ export default function App() {
 
             {/* Herramientas de dibujo */}
             <div style={{ display: 'flex', gap: '2px', background: C.bg, padding: '3px', borderRadius: '8px', border: `1px solid ${C.border}` }}>
-              {HERRAMIENTAS.map(({ id, Icon, titulo }) => (
+              {HERRAMIENTAS.map(tool => (
                 <button
-                  key={id}
-                  onClick={() => { setModo(id); if (id !== 'poligono') { setPuntosPoligono([]); setCursorCanvas(null); } }}
-                  title={titulo}
+                  key={tool.id}
+                  onClick={() => { setModo(tool.id); if (tool.id !== 'poligono') { setPuntosPoligono([]); setCursorCanvas(null); } }}
+                  title={tool.titulo}
                   style={{
                     ...btn({ padding: '5px 10px', fontSize: '13px', borderRadius: '6px' }),
-                    background: modo === id ? C.yellow : 'transparent',
-                    border: `1.5px solid ${modo === id ? C.primary : 'transparent'}`,
+                    background: modo === tool.id ? C.yellow : 'transparent',
+                    border: `1.5px solid ${modo === tool.id ? C.primary : 'transparent'}`,
                     color: C.text,
                   }}
                 >
-                  <Icon size={14} />
+                  <tool.Icon size={14} />
                 </button>
               ))}
             </div>
