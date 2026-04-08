@@ -1,34 +1,26 @@
-/* Hotspot tipo pin — animación hover */
-.chispa-interactiva {
-  transition: transform 0.18s ease, filter 0.18s ease;
-  -webkit-user-select: none;
-  user-select: none;
+/* ── Árbol de hotspots ── */
+.arbol-item:hover {
+  background: rgba(3, 174, 210, 0.07) !important;
+  border-color: rgba(3, 174, 210, 0.3) !important;
 }
 
-.chispa-interactiva:hover {
-  transform: translate(-50%, -50%) scale(1.3);
-  filter: drop-shadow(0 0 8px rgba(3, 174, 210, 0.7));
+.arbol-item:hover .arbol-delete {
+  opacity: 1 !important;
 }
 
-/* Contenido rich text en el visor */
-.visor-contenido img {
-  max-width: 100%;
-  border-radius: 8px;
-  margin: 6px 0;
+/* ── Contenido rich text en el visor ── */
+.visor-contenido {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #1a1a2e;
 }
 
-.visor-contenido a {
-  color: #03AED2;
-  text-decoration: underline;
-}
-
+.visor-contenido p     { margin: 0 0 8px; }
+.visor-contenido h1,
+.visor-contenido h2,
+.visor-contenido h3    { margin: 12px 0 6px; }
 .visor-contenido ul,
-.visor-contenido ol {
-  padding-left: 20px;
-  margin: 8px 0;
-}
-
-.visor-contenido iframe {
-  max-width: 100%;
-  border-radius: 8px;
-}
+.visor-contenido ol    { padding-left: 20px; margin: 6px 0; }
+.visor-contenido a     { color: #03AED2; text-decoration: underline; }
+.visor-contenido img   { max-width: 100%; border-radius: 8px; margin: 6px 0; display: block; }
+.visor-contenido iframe { max-width: 100%; border-radius: 8px; }
