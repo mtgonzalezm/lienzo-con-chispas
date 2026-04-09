@@ -1,36 +1,8 @@
-/* ── Animaciones toast ── */
-@keyframes slideUp {
-  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-/* ── Árbol de hotspots ── */
+/* Árbol: hover y delete */
 .arbol-item:hover {
-  background: rgba(3, 174, 210, 0.07) !important;
-  border-color: rgba(3, 174, 210, 0.3) !important;
+  background: rgba(120,200,65,0.07) !important;
+  border-color: rgba(120,200,65,0.35) !important;
 }
-
 .arbol-item:hover .arbol-delete {
   opacity: 1 !important;
 }
-
-/* ── Contenido rich text en el visor ── */
-.visor-contenido {
-  font-size: 14px;
-  line-height: 1.7;
-  color: #1a1a2e;
-}
-
-.visor-contenido p     { margin: 0 0 8px; }
-.visor-contenido h1,
-.visor-contenido h2,
-.visor-contenido h3    { margin: 12px 0 6px; }
-.visor-contenido ul,
-.visor-contenido ol    { padding-left: 20px; margin: 6px 0; }
-.visor-contenido a     { color: #03AED2; text-decoration: underline; }
-.visor-contenido img   { max-width: 100%; border-radius: 8px; margin: 6px 0; display: block; }
-.visor-contenido iframe { max-width: 100%; border-radius: 8px; }

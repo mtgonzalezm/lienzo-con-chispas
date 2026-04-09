@@ -5,11 +5,10 @@ import PanelPropiedades  from './components/PanelPropiedades';
 import CanvasEditor      from './components/CanvasEditor';
 import VisorContenido    from './components/VisorContenido';
 import { generarHTMLStandalone } from './utils/exportHTML';
+import './App.css';
 
-// ─── Paleta de colores para hotspots ─────────────────────────────────────────
 const PALETA = ['#03AED2','#9ED3DC','#FEFD99','#FF3737','#B7E778','#40DAB2','#BE6283','#ED7575'];
 
-// ─── Herramientas ─────────────────────────────────────────────────────────────
 const HERRAMIENTAS = [
   { id: 'pin',        Icon: MapPin,  titulo: 'Pin (clic)'              },
   { id: 'rectangulo', Icon: Square,  titulo: 'Rectángulo (arrastrar)'  },
@@ -17,14 +16,23 @@ const HERRAMIENTAS = [
   { id: 'poligono',   Icon: Hexagon, titulo: 'Polígono (clic × punto)' },
 ];
 
-// ─── Paleta UI ────────────────────────────────────────────────────────────────
 const C = {
-  primary: '#78C841', accent: '#B4E50D', warning: '#FF9B2F', danger: '#FB4141',
-  bg: '#f2fae8', panelBg: '#f7fdf2', white: '#fff',
-  text: '#1a1a2e', muted: '#6b7280', border: '#c8e8a0',
+  green: '#78C841', lime: '#B4E50D', orange: '#FF9B2F', red: '#FB4141',
+  white: '#ffffff', bg: '#ffffff', text: '#1a1a2e', muted: '#6b7280',
+  border: '#e5e7eb', borderAccent: '#c8e8a0',
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ── Estilos de botón ──────────────────────────────────────────────────────────
+const btnBase = {
+  display: 'inline-flex', alignItems: 'center', gap: '6px',
+  border: 'none', borderRadius: '8px', cursor: 'pointer',
+  fontFamily: "'Inter', sans-serif", fontWeight: '600', fontSize: '13px',
+  transition: 'all 0.15s',
+};
+const btnPrimary  = { ...btnBase, background: C.green, color: '#fff', padding: '7px 15px' };
+const btnGhost    = { ...btnBase, background: '#fff', color: C.text,  border: `1.5px solid ${C.border}`, padding: '6px 12px' };
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 const defaultQuiz = () => ({
   tipo: 'multiple', pregunta: '',
   opciones: ['', '', '', ''], correctas: [],
@@ -54,25 +62,18 @@ const migrarElemento = (el, idx) => ({
   } : defaultQuiz(),
 });
 
-const btn = (extra = {}) => ({
-  display: 'inline-flex', alignItems: 'center', gap: '5px',
-  border: 'none', borderRadius: '7px', cursor: 'pointer',
-  fontWeight: '600', fontFamily: 'system-ui', ...extra,
-});
-
-// ─── Toast ────────────────────────────────────────────────────────────────────
+// ── Toast ─────────────────────────────────────────────────────────────────────
 function Toast({ toast }) {
   if (!toast) return null;
-  const bg = toast.tipo === 'ok' ? '#22c55e' : toast.tipo === 'error' ? '#ef4444' : '#1a1a2e';
+  const bg = toast.tipo === 'ok' ? '#22c55e' : toast.tipo === 'error' ? C.red : C.text;
   return (
     <div style={{
-      position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
-      background: bg, color: '#fff', padding: '11px 22px', borderRadius: '100px',
-      fontSize: '13px', fontWeight: '600', zIndex: 1000,
-      display: 'flex', alignItems: 'center', gap: '8px',
-      boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
-      animation: 'slideUp 0.25s ease',
-      whiteSpace: 'nowrap',
+      position: 'fixed', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
+      background: bg, color: '#fff', padding: '10px 24px', borderRadius: '100px',
+      fontFamily: "'Inter', sans-serif", fontSize: '13px', fontWeight: '600',
+      zIndex: 1000, display: 'flex', alignItems: 'center', gap: '8px',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+      animation: 'slideUp 0.22s ease', whiteSpace: 'nowrap',
     }}>
       {toast.tipo === 'guardando' && (
         <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⏳</span>
@@ -113,16 +114,12 @@ export default function App() {
   const hasDragged    = useRef(false);
   const toastTimer    = useRef(null);
 
-  // ─── Toast ────────────────────────────────────────────────────────────────
   const mostrarToast = useCallback((tipo, msg, duracion = 2500) => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     setToast({ tipo, msg });
-    if (tipo !== 'guardando') {
-      toastTimer.current = setTimeout(() => setToast(null), duracion);
-    }
+    if (tipo !== 'guardando') toastTimer.current = setTimeout(() => setToast(null), duracion);
   }, []);
 
-  // ─── WYSIWYG ──────────────────────────────────────────────────────────────
   const leerWYSIWYG = useCallback(() => {
     if (elementoSelec && editorWysRef.current) {
       const html = editorWysRef.current.getHTML();
@@ -137,7 +134,6 @@ export default function App() {
     setElementoSelec(nuevoId);
   }, [leerWYSIWYG]);
 
-  // ─── CRUD elementos ───────────────────────────────────────────────────────
   const actualizarElemento = useCallback((id, cambios) => {
     setElementos(prev => prev.map(el => el.id === id ? { ...el, ...cambios } : el));
   }, []);
@@ -164,7 +160,6 @@ export default function App() {
     });
   }, [leerWYSIWYG]);
 
-  // ─── Coordenadas ──────────────────────────────────────────────────────────
   const obtenerCoordenadas = (cx, cy) => {
     const r = contenedorRef.current.getBoundingClientRect();
     return { x: ((cx - r.left) / r.width) * 100, y: ((cy - r.top) / r.height) * 100 };
@@ -176,7 +171,6 @@ export default function App() {
     return obtenerCoordenadas(e.clientX, e.clientY);
   };
 
-  // ─── Handlers canvas ──────────────────────────────────────────────────────
   const iniciarInteraccion = (e) => {
     if (!imagenSrc || esModoPreview || modo === 'poligono') return;
     const coords = coordsDeEvento(e);
@@ -197,9 +191,7 @@ export default function App() {
   const manejarMovimiento = (e) => {
     if (esModoPreview) return;
     const coords = coordsDeEvento(e);
-    if (dibujando) {
-      setNuevaArea(prev => ({ ...prev, w: coords.x - prev.x, h: coords.y - prev.y }));
-    }
+    if (dibujando) setNuevaArea(prev => ({ ...prev, w: coords.x - prev.x, h: coords.y - prev.y }));
     if (arrastrandoId.current && lastDragPos.current) {
       const dx = coords.x - lastDragPos.current.x;
       const dy = coords.y - lastDragPos.current.y;
@@ -217,9 +209,7 @@ export default function App() {
   const finalizarAccion = () => {
     if (dibujando) {
       setDibujando(false);
-      if (Math.abs(nuevaArea.w) > 0.5 && Math.abs(nuevaArea.h) > 0.5) {
-        crearElemento({ tipo: modo, ...nuevaArea });
-      }
+      if (Math.abs(nuevaArea.w) > 0.5 && Math.abs(nuevaArea.h) > 0.5) crearElemento({ tipo: modo, ...nuevaArea });
       setNuevaArea(null);
     }
     arrastrandoId.current = null;
@@ -228,15 +218,13 @@ export default function App() {
   const finalizarPoligono = () => {
     if (puntosPoligono.length < 3) return;
     crearElemento({ tipo: 'poligono', puntos: [...puntosPoligono] });
-    setPuntosPoligono([]);
-    setCursorCanvas(null);
+    setPuntosPoligono([]); setCursorCanvas(null);
   };
 
   const onElementoMouseDown = (id, e) => {
     if (esModoPreview) return;
     e.stopPropagation();
-    arrastrandoId.current = id;
-    hasDragged.current    = false;
+    arrastrandoId.current = id; hasDragged.current = false;
     lastDragPos.current   = coordsDeEvento(e);
   };
 
@@ -251,18 +239,15 @@ export default function App() {
     }
   };
 
-  // ─── Proyectos ────────────────────────────────────────────────────────────
   const guardarProyecto = () => {
     if (!imagenSrc) { mostrarToast('error', 'Sube una imagen primero'); return; }
-    setNombreGuardar('');
-    setModalGuardar(true);
+    setNombreGuardar(''); setModalGuardar(true);
   };
 
   const confirmarGuardar = () => {
     if (!nombreGuardar.trim()) return;
     setModalGuardar(false);
     mostrarToast('guardando', 'Guardando…');
-
     setTimeout(() => {
       let elsFinales = elementos;
       if (elementoSelec && editorWysRef.current) {
@@ -270,14 +255,13 @@ export default function App() {
         elsFinales = elementos.map(el => el.id === elementoSelec ? { ...el, contenido: html } : el);
         setElementos(elsFinales);
       }
-      const nuevo     = { id: Date.now(), nombre: nombreGuardar.trim(), imagenSrc, elementos: elsFinales };
-      const nuevoRepo = [...repositorio, nuevo];
+      const nuevoRepo = [...repositorio, { id: Date.now(), nombre: nombreGuardar.trim(), imagenSrc, elementos: elsFinales }];
       setRepositorio(nuevoRepo);
       try {
         localStorage.setItem('repositorio_chispas_v2', JSON.stringify(nuevoRepo));
         mostrarToast('ok', '✅ Guardado correctamente');
       } catch {
-        mostrarToast('error', 'Error: imagen demasiado grande para guardar', 4000);
+        mostrarToast('error', 'Error: imagen demasiado grande', 4000);
       }
     }, 80);
   };
@@ -307,7 +291,6 @@ export default function App() {
     r.readAsDataURL(f);
   };
 
-  // ─── Exportar ─────────────────────────────────────────────────────────────
   const exportarHTML = useCallback(() => {
     if (!imagenSrc) { mostrarToast('error', 'Sube una imagen primero'); return; }
     mostrarToast('guardando', 'Generando HTML…');
@@ -320,9 +303,7 @@ export default function App() {
         a.href = url; a.download = 'lienzo-interactivo.html'; a.click();
         URL.revokeObjectURL(url);
         mostrarToast('ok', '✅ HTML descargado');
-      } catch {
-        mostrarToast('error', 'Error al generar HTML');
-      }
+      } catch { mostrarToast('error', 'Error al generar HTML'); }
     }, 80);
   }, [imagenSrc, elementos, mostrarToast]);
 
@@ -336,14 +317,11 @@ export default function App() {
         const ifrCode = `<iframe src="data:text/html;base64,${enc}" width="100%" height="600" style="border:none;border-radius:8px" allowfullscreen loading="lazy"></iframe>`;
         navigator.clipboard.writeText(ifrCode)
           .then(() => mostrarToast('ok', '✅ Código iframe copiado'))
-          .catch(() => mostrarToast('error', 'No se pudo copiar al portapapeles'));
-      } catch {
-        mostrarToast('error', 'Error al generar iframe');
-      }
+          .catch(() => mostrarToast('error', 'No se pudo copiar'));
+      } catch { mostrarToast('error', 'Error al generar iframe'); }
     }, 80);
   }, [imagenSrc, elementos, mostrarToast]);
 
-  // ─────────────────────────────────────────────────────────────────────────
   const elementoActual = elementos.find(el => el.id === elementoSelec) ?? null;
 
   const canvasProps = {
@@ -360,35 +338,53 @@ export default function App() {
 
   // ─── RENDER ───────────────────────────────────────────────────────────────
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: esModoPreview ? '#1a1a2e' : C.bg, fontFamily: 'system-ui' }}>
+    <div style={{
+      height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden',
+      background: esModoPreview ? '#0f172a' : C.bg,
+      fontFamily: "'Inter', sans-serif",
+    }}>
 
       {/* ── TOOLBAR ── */}
       <header style={{
-        background: esModoPreview ? 'rgba(255,255,255,0.05)' : C.white,
-        borderBottom: `1px solid ${esModoPreview ? 'rgba(255,255,255,0.1)' : C.border}`,
-        padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '10px',
-        flexShrink: 0, flexWrap: 'wrap', zIndex: 50,
+        background: esModoPreview ? 'rgba(15,23,42,0.95)' : C.white,
+        borderBottom: `1.5px solid ${esModoPreview ? 'rgba(255,255,255,0.08)' : C.border}`,
+        padding: '0 20px', height: '56px',
+        display: 'flex', alignItems: 'center', gap: '12px',
+        flexShrink: 0, flexWrap: 'nowrap', zIndex: 50,
+        boxShadow: esModoPreview ? 'none' : '0 1px 0 rgba(0,0,0,0.06)',
       }}>
 
-        <span style={{ fontSize: '14px', fontWeight: '800', color: esModoPreview ? '#fff' : C.primary, letterSpacing: '-0.3px' }}>
+        {/* Logo */}
+        <span style={{
+          fontFamily: "'Poppins', sans-serif", fontWeight: '700', fontSize: '18px',
+          color: esModoPreview ? '#fff' : C.green, letterSpacing: '-0.5px',
+          whiteSpace: 'nowrap',
+        }}>
           ✨ Lienzo con Chispas
         </span>
 
         {!esModoPreview && (
           <>
-            <div style={{ width: '1px', height: '22px', background: C.border }} />
+            <div style={{ width: '1px', height: '24px', background: C.border, flexShrink: 0 }} />
 
-            <div style={{ display: 'flex', gap: '2px', background: C.bg, padding: '3px', borderRadius: '8px', border: `1px solid ${C.border}` }}>
+            {/* Herramientas */}
+            <div style={{
+              display: 'flex', gap: '2px',
+              background: '#f9fafb', padding: '3px', borderRadius: '10px',
+              border: `1px solid ${C.border}`,
+            }}>
               {HERRAMIENTAS.map(tool => (
                 <button
                   key={tool.id}
                   onClick={() => { setModo(tool.id); if (tool.id !== 'poligono') { setPuntosPoligono([]); setCursorCanvas(null); } }}
                   title={tool.titulo}
                   style={{
-                    ...btn({ padding: '5px 10px', fontSize: '13px', borderRadius: '6px' }),
-                    background: modo === tool.id ? C.accent : 'transparent',
-                    border: `1.5px solid ${modo === tool.id ? C.primary : 'transparent'}`,
-                    color: C.text,
+                    ...btnBase,
+                    padding: '5px 11px', borderRadius: '7px', fontSize: '13px',
+                    background: modo === tool.id ? C.green : 'transparent',
+                    border: 'none',
+                    color: modo === tool.id ? '#fff' : C.muted,
+                    boxShadow: modo === tool.id ? '0 2px 8px rgba(120,200,65,0.35)' : 'none',
                   }}
                 >
                   <tool.Icon size={14} />
@@ -396,17 +392,27 @@ export default function App() {
               ))}
             </div>
 
+            {/* Banner polígono */}
             {modo === 'poligono' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 10px', background: C.accent, borderRadius: '6px', border: `1px solid ${C.primary}`, fontSize: '12px', color: C.text }}>
-                <Hexagon size={12} color={C.primary} />
-                <span><b>{puntosPoligono.length}</b> punto(s)</span>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '5px 12px', background: '#f0fdf4',
+                borderRadius: '8px', border: `1px solid ${C.green}44`,
+                fontSize: '12px', color: C.text, fontFamily: "'Inter', sans-serif",
+              }}>
+                <Hexagon size={12} color={C.green} />
+                <span style={{ fontWeight: '500' }}><b>{puntosPoligono.length}</b> punto(s)</span>
                 {puntosPoligono.length >= 3 && (
-                  <button onClick={finalizarPoligono} style={{ ...btn({ padding: '2px 8px', fontSize: '11px', background: C.primary, color: '#fff' }) }}>
+                  <button
+                    onClick={finalizarPoligono}
+                    style={{ ...btnPrimary, padding: '3px 10px', fontSize: '11px' }}
+                  >
                     <Check size={11} /> Cerrar
                   </button>
                 )}
                 {puntosPoligono.length > 0 && (
-                  <button onClick={() => { setPuntosPoligono([]); setCursorCanvas(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.danger, fontSize: '13px', lineHeight: 1 }}>✕</button>
+                  <button onClick={() => { setPuntosPoligono([]); setCursorCanvas(null); }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.red, fontSize: '14px', lineHeight: 1, padding: '2px' }}>✕</button>
                 )}
               </div>
             )}
@@ -415,27 +421,32 @@ export default function App() {
 
         <div style={{ flex: 1 }} />
 
+        {/* Acciones */}
         {!esModoPreview ? (
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-            <label style={{ ...btn({ padding: '6px 12px', fontSize: '12px', background: C.bg, color: C.text, border: `1px solid ${C.border}` }), cursor: 'pointer' }}>
+            <label style={{ ...btnGhost, cursor: 'pointer' }}>
               <ImagePlus size={14} /> Imagen
               <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
             </label>
-            <button onClick={guardarProyecto} style={{ ...btn({ padding: '6px 13px', fontSize: '12px', background: C.primary, color: '#fff' }) }}>
+            <button onClick={guardarProyecto} style={btnPrimary}>
               <Save size={13} /> Guardar
             </button>
-            <button onClick={exportarHTML} title="Descargar HTML standalone" style={{ ...btn({ padding: '6px 10px', fontSize: '12px', background: C.bg, color: C.text, border: `1px solid ${C.border}` }) }}>
+            <button onClick={exportarHTML} title="Descargar HTML standalone" style={btnGhost}>
               <Download size={13} />
             </button>
-            <button onClick={copiarIframe} title="Copiar código iframe" style={{ ...btn({ padding: '6px 10px', fontSize: '12px', background: C.bg, color: C.text, border: `1px solid ${C.border}` }) }}>
+            <button onClick={copiarIframe} title="Copiar código iframe" style={btnGhost}>
               <Code2 size={13} />
             </button>
-            <button onClick={enterPreview} style={{ ...btn({ padding: '6px 13px', fontSize: '12px', background: C.text, color: '#fff' }) }}>
+            <button onClick={enterPreview} style={{ ...btnBase, background: C.text, color: '#fff', padding: '7px 15px' }}>
               <Eye size={13} /> Vista previa
             </button>
           </div>
         ) : (
-          <button onClick={exitPreview} style={{ ...btn({ padding: '7px 16px', fontSize: '12px', background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }) }}>
+          <button onClick={exitPreview} style={{
+            ...btnBase,
+            background: 'rgba(255,255,255,0.1)', color: '#fff',
+            border: '1px solid rgba(255,255,255,0.2)', padding: '7px 16px',
+          }}>
             <EyeOff size={14} /> Salir de vista previa
           </button>
         )}
@@ -443,7 +454,6 @@ export default function App() {
 
       {/* ── CUERPO ── */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-
         {!esModoPreview && (
           <PanelArbol
             elementos={elementos}
@@ -469,46 +479,63 @@ export default function App() {
         )}
       </div>
 
-      {/* Visor popup (preview) */}
       {hotspotVisor && (
         <VisorContenido elemento={hotspotVisor} onClose={() => setHotspotVisor(null)} />
       )}
 
-      {/* Toast */}
       <Toast toast={toast} />
 
       {/* Modal guardar */}
       {modalGuardar && (
         <div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}
           onClick={() => setModalGuardar(false)}
         >
           <div
-            style={{ background: '#fff', padding: '24px', borderRadius: '16px', width: '360px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', borderTop: `4px solid ${C.primary}` }}
+            style={{
+              background: '#fff', padding: '28px 28px 24px', borderRadius: '16px',
+              width: '380px', boxShadow: '0 24px 60px rgba(0,0,0,0.2)',
+              borderTop: `4px solid ${C.green}`,
+            }}
             onClick={e => e.stopPropagation()}
           >
-            <h3 style={{ margin: '0 0 16px', fontSize: '15px', color: C.text, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Save size={14} color={C.primary} /> Guardar proyecto
+            <h3 style={{
+              margin: '0 0 6px', fontFamily: "'Poppins', sans-serif",
+              fontWeight: '700', fontSize: '17px', color: C.text,
+              display: 'flex', alignItems: 'center', gap: '8px',
+            }}>
+              <Save size={16} color={C.green} /> Guardar proyecto
             </h3>
+            <p style={{ margin: '0 0 18px', fontSize: '13px', color: C.muted, fontFamily: "'Inter', sans-serif" }}>
+              Ponle un nombre para encontrarlo fácilmente
+            </p>
             <input
               autoFocus
               value={nombreGuardar}
               onChange={e => setNombreGuardar(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && confirmarGuardar()}
               placeholder="Nombre del proyecto"
-              style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: `1.5px solid ${C.border}`, fontSize: '14px', boxSizing: 'border-box', marginBottom: '16px', outline: 'none', fontFamily: 'system-ui' }}
+              style={{
+                width: '100%', padding: '10px 13px', borderRadius: '9px',
+                border: `1.5px solid ${C.border}`, fontSize: '14px',
+                boxSizing: 'border-box', marginBottom: '18px', outline: 'none',
+                fontFamily: "'Inter', sans-serif", transition: 'border-color 0.15s',
+              }}
+              onFocus={e => { e.target.style.borderColor = C.green; }}
+              onBlur={e => { e.target.style.borderColor = C.border; }}
             />
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => setModalGuardar(false)}
-                style={{ ...btn({ padding: '8px 16px', fontSize: '13px', background: 'none', border: `1px solid ${C.border}`, color: C.muted }) }}
-              >
+              <button onClick={() => setModalGuardar(false)} style={btnGhost}>
                 Cancelar
               </button>
               <button
                 onClick={confirmarGuardar}
                 disabled={!nombreGuardar.trim()}
-                style={{ ...btn({ padding: '8px 16px', fontSize: '13px', background: nombreGuardar.trim() ? C.primary : '#d1d5db', color: '#fff', cursor: nombreGuardar.trim() ? 'pointer' : 'not-allowed' }) }}
+                style={{
+                  ...btnPrimary,
+                  opacity: nombreGuardar.trim() ? 1 : 0.45,
+                  cursor: nombreGuardar.trim() ? 'pointer' : 'not-allowed',
+                }}
               >
                 <Check size={13} /> Guardar
               </button>
