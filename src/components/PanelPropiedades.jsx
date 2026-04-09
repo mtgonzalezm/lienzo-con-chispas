@@ -79,10 +79,10 @@ export default function PanelPropiedades({ elemento, onUpdate, onBorrar, editorW
     return (
       <aside style={{
         width: '280px', flexShrink: 0,
-        borderLeft: `1.5px solid ${C.border}`,
+        borderLeft: `2px solid ${C.green}`,
         backgroundColor: C.panel,
         display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px',
-        boxShadow: '-1px 0 0 rgba(0,0,0,0.04)',
+        boxShadow: `-2px 0 12px rgba(120,200,65,0.12)`,
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '36px', marginBottom: '12px' }}>👈</div>
@@ -102,10 +102,10 @@ export default function PanelPropiedades({ elemento, onUpdate, onBorrar, editorW
   return (
     <aside style={{
       width: '280px', flexShrink: 0,
-      borderLeft: `1.5px solid ${C.border}`,
+      borderLeft: `2px solid ${C.green}`,
       backgroundColor: C.panel,
       display: 'flex', flexDirection: 'column', overflow: 'hidden',
-      boxShadow: '-1px 0 0 rgba(0,0,0,0.04)',
+      boxShadow: `-2px 0 12px rgba(120,200,65,0.12)`,
     }}>
 
       {/* Cabecera */}

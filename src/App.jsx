@@ -347,31 +347,31 @@ export default function App() {
       {/* ── TOOLBAR ── */}
       <header style={{
         background: esModoPreview ? 'rgba(15,23,42,0.95)' : C.white,
-        borderBottom: `1.5px solid ${esModoPreview ? 'rgba(255,255,255,0.08)' : C.border}`,
-        padding: '0 20px', height: '56px',
-        display: 'flex', alignItems: 'center', gap: '12px',
+        borderBottom: `2px solid ${esModoPreview ? 'rgba(255,255,255,0.08)' : C.green}`,
+        padding: '0 24px', height: '72px',
+        display: 'flex', alignItems: 'center', gap: '14px',
         flexShrink: 0, flexWrap: 'nowrap', zIndex: 50,
-        boxShadow: esModoPreview ? 'none' : '0 1px 0 rgba(0,0,0,0.06)',
+        boxShadow: esModoPreview ? 'none' : `0 2px 12px rgba(120,200,65,0.18)`,
       }}>
 
         {/* Logo */}
         <span style={{
-          fontFamily: "'Poppins', sans-serif", fontWeight: '700', fontSize: '18px',
-          color: esModoPreview ? '#fff' : C.green, letterSpacing: '-0.5px',
-          whiteSpace: 'nowrap',
+          fontFamily: "'Poppins', sans-serif", fontWeight: '700', fontSize: '36px',
+          color: esModoPreview ? '#fff' : '#1a1a1a', letterSpacing: '-1px',
+          whiteSpace: 'nowrap', lineHeight: 1,
         }}>
           ✨ Lienzo con Chispas
         </span>
 
         {!esModoPreview && (
           <>
-            <div style={{ width: '1px', height: '24px', background: C.border, flexShrink: 0 }} />
+            <div style={{ width: '1.5px', height: '28px', background: `${C.green}50`, flexShrink: 0 }} />
 
             {/* Herramientas */}
             <div style={{
-              display: 'flex', gap: '2px',
-              background: '#f9fafb', padding: '3px', borderRadius: '10px',
-              border: `1px solid ${C.border}`,
+              display: 'flex', gap: '3px',
+              background: `${C.green}10`, padding: '4px', borderRadius: '10px',
+              border: `1.5px solid ${C.green}40`,
             }}>
               {HERRAMIENTAS.map(tool => (
                 <button
@@ -380,14 +380,14 @@ export default function App() {
                   title={tool.titulo}
                   style={{
                     ...btnBase,
-                    padding: '5px 11px', borderRadius: '7px', fontSize: '13px',
+                    padding: '7px 13px', borderRadius: '7px', fontSize: '13px',
                     background: modo === tool.id ? C.green : 'transparent',
                     border: 'none',
-                    color: modo === tool.id ? '#fff' : C.muted,
-                    boxShadow: modo === tool.id ? '0 2px 8px rgba(120,200,65,0.35)' : 'none',
+                    color: modo === tool.id ? '#fff' : C.green,
+                    boxShadow: modo === tool.id ? `0 3px 10px rgba(120,200,65,0.45)` : 'none',
                   }}
                 >
-                  <tool.Icon size={14} />
+                  <tool.Icon size={15} />
                 </button>
               ))}
             </div>

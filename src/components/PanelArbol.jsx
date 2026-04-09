@@ -20,10 +20,10 @@ export default function PanelArbol({
   return (
     <aside style={{
       width: '220px', flexShrink: 0,
-      borderRight: `1.5px solid ${C.border}`,
+      borderRight: `2px solid ${C.green}`,
       backgroundColor: C.panel,
       display: 'flex', flexDirection: 'column', overflow: 'hidden',
-      boxShadow: '1px 0 0 rgba(0,0,0,0.04)',
+      boxShadow: `2px 0 12px rgba(120,200,65,0.12)`,
     }}>
 
       {/* Cabecera hotspots */}
