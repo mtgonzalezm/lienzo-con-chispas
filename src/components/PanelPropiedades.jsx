@@ -1,12 +1,20 @@
-import React from 'react';
-import { Settings2, Type, HelpCircle, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Settings2, Type, HelpCircle, Trash2, Eye, EyeOff, Smile } from 'lucide-react';
 import EditorWYSIWYG from './EditorWYSIWYG';
 import EditorQuiz from './EditorQuiz';
 
 const C = {
-  primary: '#03AED2', border: '#c8e8ee', bg: '#eaf7fa',
-  text: '#1a1a2e', muted: '#6b7280', danger: '#FF3737', panel: '#f4fbfd',
+  primary: '#78C841', border: '#c8e8a0', bg: '#f2fae8',
+  text: '#1a1a2e', muted: '#6b7280', danger: '#FB4141', panel: '#f7fdf2',
 };
+
+const PALETA_COLORES = ['#03AED2','#9ED3DC','#FEFD99','#FF3737','#B7E778','#40DAB2','#BE6283','#ED7575'];
+
+const EMOJIS = [
+  '💬','📌','⭐','🔥','💡','📚','🎯','✅',
+  '❓','❗','🔍','🗺️','🏆','💎','🎓','⚡',
+  '🌟','🔑','🧩','📋','🎨','🖼️','📷','🌍',
+];
 
 const labelStyle = {
   fontSize: '10px', color: C.muted, display: 'block',
@@ -19,7 +27,32 @@ const inputStyle = {
   fontSize: '13px', fontFamily: 'system-ui', outline: 'none', background: '#fff',
 };
 
+function Toggle({ checked, onChange, label }) {
+  return (
+    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', userSelect: 'none' }}>
+      <span style={{ fontSize: '12px', color: C.text, fontWeight: '500' }}>{label}</span>
+      <div
+        onClick={onChange}
+        style={{
+          width: '34px', height: '18px', borderRadius: '9px',
+          background: checked ? C.primary : '#d1d5db',
+          position: 'relative', transition: 'background 0.2s', flexShrink: 0,
+        }}
+      >
+        <div style={{
+          position: 'absolute', top: '2px',
+          left: checked ? '18px' : '2px',
+          width: '14px', height: '14px', borderRadius: '50%',
+          background: '#fff', transition: 'left 0.2s',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+        }} />
+      </div>
+    </label>
+  );
+}
+
 export default function PanelPropiedades({ elemento, onUpdate, onBorrar, editorWysRef, paleta }) {
+  const [mostrarSelectorEmoji, setMostrarSelectorEmoji] = useState(false);
 
   if (!elemento) {
     return (
@@ -31,7 +64,10 @@ export default function PanelPropiedades({ elemento, onUpdate, onBorrar, editorW
     );
   }
 
-  const { id, nombre, color = C.primary, tipoContenido = 'texto', quiz, contenido } = elemento;
+  const {
+    id, nombre, color = C.primary, tipoContenido = 'texto', quiz, contenido,
+    emoji = '💬', mostrarEmoji = false, oculto = false,
+  } = elemento;
 
   return (
     <aside style={{ width: '270px', flexShrink: 0, borderLeft: `1px solid ${C.border}`, backgroundColor: C.panel, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -44,7 +80,7 @@ export default function PanelPropiedades({ elemento, onUpdate, onBorrar, editorW
         </span>
       </div>
 
-      {/* Cuerpo (scrollable) */}
+      {/* Cuerpo */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 12px 8px' }}>
 
         {/* Nombre */}
@@ -58,11 +94,68 @@ export default function PanelPropiedades({ elemento, onUpdate, onBorrar, editorW
           />
         </div>
 
+        {/* ── Emoji ── */}
+        <div style={{ marginBottom: '12px' }}>
+          <label style={labelStyle}>Emoji</label>
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            <button
+              onClick={() => setMostrarSelectorEmoji(p => !p)}
+              style={{
+                width: '40px', height: '40px', borderRadius: '8px', fontSize: '20px',
+                border: `1.5px solid ${mostrarSelectorEmoji ? color : C.border}`,
+                background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: mostrarSelectorEmoji ? `0 0 0 3px ${color}30` : 'none',
+                transition: 'all 0.15s',
+              }}
+              title="Cambiar emoji"
+            >
+              {emoji}
+            </button>
+            <div style={{ flex: 1 }}>
+              <Toggle
+                checked={mostrarEmoji}
+                onChange={() => onUpdate({ mostrarEmoji: !mostrarEmoji })}
+                label="Siempre visible"
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Smile size={11} color={C.muted} />
+            </div>
+          </div>
+
+          {/* Selector de emojis desplegable */}
+          {mostrarSelectorEmoji && (
+            <div style={{
+              marginTop: '8px', padding: '8px', background: '#fff',
+              border: `1px solid ${C.border}`, borderRadius: '10px',
+              display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '4px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+            }}>
+              {EMOJIS.map(em => (
+                <button
+                  key={em}
+                  onClick={() => { onUpdate({ emoji: em }); setMostrarSelectorEmoji(false); }}
+                  style={{
+                    padding: '6px', fontSize: '18px', borderRadius: '6px',
+                    border: `1.5px solid ${emoji === em ? color : 'transparent'}`,
+                    background: emoji === em ? `${color}15` : 'transparent',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.1s',
+                  }}
+                  title={em}
+                >
+                  {em}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Color */}
         <div style={{ marginBottom: '14px' }}>
-          <label style={labelStyle}>Color</label>
+          <label style={labelStyle}>Color del hotspot</label>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {paleta.map(c => (
+            {(paleta || PALETA_COLORES).map(c => (
               <button
                 key={c}
                 onClick={() => onUpdate({ color: c })}
@@ -78,6 +171,23 @@ export default function PanelPropiedades({ elemento, onUpdate, onBorrar, editorW
               />
             ))}
           </div>
+        </div>
+
+        {/* ── Visibilidad ── */}
+        <div style={{ marginBottom: '14px', padding: '8px 10px', background: oculto ? '#fef2f2' : '#fff', borderRadius: '8px', border: `1px solid ${oculto ? '#fecaca' : C.border}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            {oculto ? <EyeOff size={12} color={C.danger} /> : <Eye size={12} color={C.primary} />}
+            <Toggle
+              checked={!oculto}
+              onChange={() => onUpdate({ oculto: !oculto })}
+              label={oculto ? 'Hotspot oculto' : 'Hotspot visible'}
+            />
+          </div>
+          {oculto && (
+            <p style={{ fontSize: '10px', color: C.danger, margin: 0, lineHeight: '1.4' }}>
+              Este hotspot no aparecerá en la vista previa ni en la exportación.
+            </p>
+          )}
         </div>
 
         {/* Tipo de contenido */}
@@ -107,7 +217,7 @@ export default function PanelPropiedades({ elemento, onUpdate, onBorrar, editorW
           </div>
         </div>
 
-        {/* ── Editor de contenido ── */}
+        {/* Editor de contenido */}
         {tipoContenido === 'texto' ? (
           <div>
             <label style={labelStyle}>Contenido</label>

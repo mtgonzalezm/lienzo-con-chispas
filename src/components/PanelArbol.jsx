@@ -1,9 +1,9 @@
 import React from 'react';
-import { Layers, MapPin, Square, Circle, Hexagon, HelpCircle, Trash2, FolderOpen, FolderX } from 'lucide-react';
+import { Layers, MapPin, Square, Circle, Hexagon, HelpCircle, Trash2, FolderOpen, FolderX, EyeOff } from 'lucide-react';
 
 const C = {
-  primary: '#03AED2', border: '#c8e8ee', bg: '#eaf7fa',
-  text: '#1a1a2e', muted: '#6b7280', danger: '#FF3737', panel: '#f4fbfd',
+  primary: '#78C841', border: '#c8e8a0', bg: '#f2fae8',
+  text: '#1a1a2e', muted: '#6b7280', danger: '#FB4141', panel: '#f7fdf2',
 };
 
 const ICON_TIPO = { pin: MapPin, rectangulo: Square, area: Square, circulo: Circle, poligono: Hexagon };
@@ -59,9 +59,12 @@ export default function PanelArbol({
                 {el.nombre}
               </span>
 
-              {/* Quiz badge */}
+              {/* Badges */}
               {el.tipoContenido === 'quiz' && (
                 <HelpCircle size={10} color={color} style={{ flexShrink: 0, opacity: 0.7 }} />
+              )}
+              {el.oculto && (
+                <EyeOff size={10} color={C.danger} style={{ flexShrink: 0, opacity: 0.7 }} />
               )}
 
               {/* Delete */}
